@@ -15,11 +15,11 @@
 7. [Project Structure](#project-structure)
 8. [Prerequisites](#prerequisites)
 9. [Installation — Step by Step](#installation--step-by-step)
-   - [Step 1: Clone / Download the Project](#step-1-clone--download-the-project)
-   - [Step 2: Set Up Python Environment](#step-2-set-up-python-environment)
+   - [Step 1: Clone the Repository](#step-1-clone-the-repository)
+   - [Step 2: Set Up Python Virtual Environment](#step-2-set-up-python-virtual-environment)
    - [Step 3: Install Python Dependencies](#step-3-install-python-dependencies)
    - [Step 4: Get API Keys](#step-4-get-api-keys)
-   - [Step 5: Configure Environment Variables](#step-5-configure-environment-variables)
+   - [Step 5: Create and Configure the .env.local File](#step-5-create-and-configure-the-envlocal-file)
    - [Step 6: Install Node.js Dependencies](#step-6-install-nodejs-dependencies)
    - [Step 7: Start the Flask ML Server](#step-7-start-the-flask-ml-server)
    - [Step 8: Start the Next.js Frontend](#step-8-start-the-nextjs-frontend)
@@ -285,36 +285,56 @@ Both are free to sign up with no credit card required.
 
 ## Installation — Step by Step
 
-### Step 1: Clone / Download the Project
+### Step 1: Clone the Repository
 
-If you have git:
+Open a terminal and run:
+
 ```bash
-git clone <your-repo-url>
-cd PlantDisease
+git clone https://github.com/shalomarputhasingh/PlantDiseaseFinder.git
+cd PlantDiseaseFinder
 ```
 
-Or if you downloaded a ZIP, extract it and open a terminal in the `PlantDisease` folder.
+After cloning, verify your folder structure looks like this:
 
-Verify your folder looks like this:
 ```
-PlantDisease/
-  backend/
-  frontend/
-  models/
-  README.md
+PlantDiseaseFinder/
+├── backend/
+│   ├── app.py
+│   ├── class_labels.py
+│   └── requirements.txt
+├── frontend/
+│   ├── app/
+│   ├── components/
+│   ├── lib/
+│   └── package.json
+├── models/
+│   ├── mobilenet_v2_1.0_224-plant-disease-identification/
+│   │   ├── pytorch_model.bin     ← primary model weights
+│   │   └── config.json
+│   └── mobilenetv2_plant.pth     ← secondary model weights
+└── README.md
 ```
+
+> If any model file is missing, re-run `git pull` to make sure everything downloaded correctly.
 
 ---
 
-### Step 2: Set Up Python Environment
+### Step 2: Set Up Python Virtual Environment
 
-It is strongly recommended to use a **virtual environment** to avoid package conflicts.
+A virtual environment keeps the project's Python packages isolated from your system Python. This is strongly recommended.
 
-**On Windows:**
+**On Windows (Command Prompt or PowerShell):**
 ```bash
 cd backend
 python -m venv venv
 venv\Scripts\activate
+```
+
+**On Windows (Git Bash):**
+```bash
+cd backend
+python -m venv venv
+source venv/Scripts/activate
 ```
 
 **On macOS / Linux:**
@@ -324,15 +344,19 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-You should see `(venv)` at the start of your terminal prompt. Keep this terminal open — you will need it for Step 3 and Step 7.
+After activation you will see `(venv)` at the start of your terminal prompt:
+```
+(venv) C:\...\backend>
+```
 
-> To deactivate the virtual environment later: run `deactivate`
+> Keep this terminal open — you will run `python app.py` here in Step 7.
+> To deactivate later: run `deactivate`
 
 ---
 
 ### Step 3: Install Python Dependencies
 
-With the virtual environment active (from Step 2), install all required packages:
+With the virtual environment active, install all required packages:
 
 ```bash
 pip install -r requirements.txt
@@ -349,51 +373,123 @@ This installs:
 | `transformers` | ≥ 4.27 | HuggingFace library — loads the primary model |
 | `pillow` | ≥ 10.0 | Image decoding (JPEG, PNG, WEBP) |
 
-> **Note on torch installation time:** PyTorch is ~2GB. The first install may take several minutes depending on your internet speed. Be patient.
+Expected output ends with:
+```
+Successfully installed flask-3.x torch-2.x torchvision-0.x transformers-4.x ...
+```
 
-> **GPU support:** If you have an NVIDIA GPU with CUDA, install the CUDA version of PyTorch for faster inference:
+> **PyTorch download is large (~2GB).** The first install may take 5–15 minutes on a slow connection. Be patient — it only happens once.
+
+> **GPU acceleration (optional):** If you have an NVIDIA GPU, install the CUDA build for faster inference:
 > ```bash
 > pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 > ```
-> If you don't have a GPU, the CPU version installed by `requirements.txt` works fine.
+> The app works fine on CPU — CUDA is optional.
 
 ---
 
-### Step 4: Get API Keys
+### Step 4: Get Your API Keys
 
-You need two free API keys. Open these links and sign up:
+This app needs two free API keys — one for generating explanations, one for the chat assistant. Both are completely free to sign up for, no credit card required.
 
-#### OpenRouter (for Explanation Agent)
-1. Go to **https://openrouter.ai**
-2. Click **Sign In** → create a free account
-3. Go to **Keys** → click **Create Key**
-4. Copy the key — it looks like: `sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxx`
+---
 
-The free tier includes access to `meta-llama/llama-3.2-11b-vision-instruct` which this app uses.
+#### 4a. OpenRouter API Key (for the Explanation Agent)
 
-#### Groq (for Chat Agent)
+The Explanation Agent uses `meta-llama/llama-3.2-11b-vision-instruct` via OpenRouter.
+
+1. Open your browser and go to **https://openrouter.ai**
+2. Click **Sign In** in the top right → choose Google, GitHub, or email
+3. Once logged in, click your avatar → **Keys**
+4. Click **+ Create Key**, give it a name like `PlantHealthAI`
+5. Copy the key immediately — it looks like:
+   ```
+   sk-or-v1-a1b2c3d4e5f6...
+   ```
+   > You can only see the full key once. Save it somewhere before closing the page.
+
+The free tier provides enough credits to run this app for personal use.
+
+---
+
+#### 4b. Groq API Key (for the Chat Agent)
+
+The Chat Agent uses `llama-3.3-70b-versatile` via Groq for fast streaming responses.
+
 1. Go to **https://console.groq.com**
-2. Click **Sign Up** → create a free account
-3. Go to **API Keys** → click **Create API Key**
-4. Copy the key — it looks like: `gsk_xxxxxxxxxxxxxxxxxxxxxxxx`
+2. Click **Sign Up** → create an account with Google or email
+3. After logging in, click **API Keys** in the left sidebar
+4. Click **+ Create API Key**, name it `PlantHealthAI`
+5. Copy the key — it looks like:
+   ```
+   gsk_a1b2c3d4e5f6...
+   ```
+   > Save it before closing — it won't be shown again.
 
-The free tier includes generous usage of `llama-3.3-70b-versatile` which this app uses.
+Groq's free tier is very generous and more than sufficient for this app.
 
 ---
 
-### Step 5: Configure Environment Variables
+### Step 5: Create and Configure the `.env.local` File
 
-Open `frontend/.env.local` in any text editor and fill in your keys:
+The frontend needs your API keys in a special environment file called `.env.local`. This file is **never committed to git** (it's in `.gitignore`) — you create it yourself on each machine.
+
+**Option A — Create it manually:**
+
+Navigate to the `frontend/` folder and create a new file called `.env.local`:
+
+```
+frontend/
+└── .env.local    ← create this file
+```
+
+Paste the following into it, replacing the placeholder values with your real keys:
 
 ```env
-OPENROUTER_API_KEY=sk-or-v1-your-key-here
-GROQ_API_KEY=gsk_your-key-here
+# .env.local — DO NOT commit this file to git
+
+# OpenRouter API key (from Step 4a)
+OPENROUTER_API_KEY=sk-or-v1-your-openrouter-key-here
+
+# Groq API key (from Step 4b)
+GROQ_API_KEY=gsk_your-groq-key-here
+
+# Flask ML server URL (leave as-is for local development)
 FLASK_API_URL=http://localhost:5000
 ```
 
-Replace the placeholder values with your actual keys from Step 4.
+**Option B — Create it from the terminal:**
 
-> **Security:** Never commit `.env.local` to git. It is already in `.gitignore`.
+```bash
+# From the project root
+cd frontend
+
+# On Windows (PowerShell):
+@"
+OPENROUTER_API_KEY=sk-or-v1-your-openrouter-key-here
+GROQ_API_KEY=gsk_your-groq-key-here
+FLASK_API_URL=http://localhost:5000
+"@ | Out-File -Encoding utf8 .env.local
+
+# On macOS / Linux / Git Bash:
+cat > .env.local << 'EOF'
+OPENROUTER_API_KEY=sk-or-v1-your-openrouter-key-here
+GROQ_API_KEY=gsk_your-groq-key-here
+FLASK_API_URL=http://localhost:5000
+EOF
+```
+
+Then open the file in a text editor and replace the placeholder values with your actual keys from Step 4.
+
+**Verify the file looks correct:**
+```bash
+cat .env.local
+# Should print your three variables — make sure none say "your-key-here"
+```
+
+> **Important:** The file must be named exactly `.env.local` (with the leading dot). If you name it `env.local` or `.env`, it will not be loaded.
+
+> **Security:** Never share this file or commit it to GitHub. Your keys are private.
 
 ---
 
