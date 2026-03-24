@@ -9,9 +9,7 @@ frontend/node_modules/
 frontend/.next/
 frontend/.env.local
 
-# Model weights (large files — download separately)
-*.pth
-*.bin
+# Model training runs (large, not needed)
 models/mobilenet_v2_1.0_224-plant-disease-identification/runs/
 models/mobilenet_v2_1.0_224-plant-disease-identification/.git/
 backend/models/
