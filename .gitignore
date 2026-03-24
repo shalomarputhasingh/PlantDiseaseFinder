@@ -1,0 +1,22 @@
+# Python
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+__pycache__/
+
+# Node
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+
+# Model weights (large files — download separately)
+*.pth
+*.bin
+models/mobilenet_v2_1.0_224-plant-disease-identification/runs/
+models/mobilenet_v2_1.0_224-plant-disease-identification/.git/
+backend/models/
+
+# Misc
+.DS_Store
+nextapp/
+.claude/

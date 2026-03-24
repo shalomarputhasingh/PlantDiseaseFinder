@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  --primary:      #1a3c2b;
+  --primary-soft: #2d5a40;
+  --accent:       #7ab648;
+  --warm:         #f5f0e8;
+  --text:         #1a1a1a;
+  --muted:        #6b7280;
+  --surface:      #ffffff;
+  --danger:       #dc2626;
+  --warning:      #d97706;
+  --caution:      #ca8a04;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--warm);
+  color: var(--text);
+  font-family: "DM Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Playfair Display", serif;
+}
+
+/* Animations */
+@keyframes leafPulse {
+  0%, 100% { transform: scale(1.0); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInOnly {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.7); }
+  70%  { transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-leaf-pulse     { animation: leafPulse 8s ease-in-out infinite; }
+.animate-fade-in        { animation: fadeIn 0.6s ease-out both; }
+.animate-fade-in-only   { animation: fadeInOnly 0.8s ease-in-out both; }
+.animate-pop-in         { animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+.animate-slide-up       { animation: slideUp 0.4s ease-out both; }
+.animate-spin-slow      { animation: spin 1s linear infinite; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--primary-soft); border-radius: 999px; }
