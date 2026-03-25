@@ -18,7 +18,7 @@ import torchvision.transforms as transforms
 from PIL import Image
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from transformers import MobileNetV2ForImageClassification, AutoImageProcessor
+from transformers import MobileNetV2ForImageClassification, MobileNetV2ImageProcessor
 
 from class_labels import CLASS_LABELS
 
@@ -47,7 +47,7 @@ TV_TRANSFORM = transforms.Compose([
 
 log.info("Loading primary model (HuggingFace MobileNetV2) from %s …", HF_MODEL_PATH)
 try:
-    hf_processor = AutoImageProcessor.from_pretrained(HF_MODEL_PATH, local_files_only=True)
+    hf_processor = MobileNetV2ImageProcessor.from_pretrained(HF_MODEL_PATH, local_files_only=True)
     hf_model = MobileNetV2ForImageClassification.from_pretrained(
         HF_MODEL_PATH, local_files_only=True
     )
@@ -197,4 +197,4 @@ def predict():
 # ─── Entry point ──────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host="0.0.0.0", port=8000, debug=False)

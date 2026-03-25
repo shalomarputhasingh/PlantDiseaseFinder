@@ -50,6 +50,22 @@ const LABEL_METADATA: Record<string, { cleanDiseaseName: string; isHealthy: bool
   "Healthy Tomato Plant":                                    { cleanDiseaseName: "Healthy",                isHealthy: true  },
 };
 
+function extractPlantName(label: string): string {
+  const lower = label.toLowerCase();
+  const plants = [
+    "apple", "blueberry", "cherry", "corn", "maize", "grape",
+    "orange", "peach", "bell pepper", "pepper", "potato",
+    "raspberry", "soybean", "squash", "strawberry", "tomato",
+  ];
+  for (const plant of plants) {
+    if (lower.includes(plant)) {
+      return plant.split(" ").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+    }
+  }
+  // Fallback: first word of the label
+  return label.split(" ")[0];
+}
+
 function mapHealthLevel(isHealthy: boolean, confidence: number, label: string): string {
   if (isHealthy) return "Healthy";
   const lower = label.toLowerCase();
@@ -125,6 +141,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       rawLabel: finalLabel,
+      plantName: extractPlantName(finalLabel),
       cleanDiseaseName: meta.cleanDiseaseName,
       isHealthy: meta.isHealthy,
       healthLevel,
