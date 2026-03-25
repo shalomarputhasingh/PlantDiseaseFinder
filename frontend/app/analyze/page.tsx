@@ -47,13 +47,12 @@ export default function AnalyzePage() {
   const [pageState, setPageState] = useState<PageState>("idle");
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [language, setLanguage] = useState<"en" | "ta">(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("plant-ai-language");
-      if (saved === "en" || saved === "ta") return saved;
-    }
-    return "en";
-  });
+  const [language, setLanguage] = useState<"en" | "ta">("en");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("plant-ai-language");
+    if (saved === "en" || saved === "ta") setLanguage(saved);
+  }, []);
   const [classification, setClassification] = useState<ClassificationResult | null>(null);
   const [explanation, setExplanation] = useState<ExplanationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -103,7 +102,8 @@ export default function AnalyzePage() {
       });
       if (!classifyRes.ok) {
         const err = await classifyRes.json();
-        throw new Error(err.error || "Classification failed");
+        const detail = err.detail ? ` — ${err.detail}` : "";
+        throw new Error((err.error || "Classification failed") + detail);
       }
       const classResult: ClassificationResult = await classifyRes.json();
       setClassification(classResult);
